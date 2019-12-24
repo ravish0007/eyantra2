@@ -1,20 +1,17 @@
-
-
-
-
 /*
- * PROGRAM FOR SENDING JOYSTICK DATA OVER NRF24L01 
+ * PROGRAM FOR SENDING JOYSTICK DATA OVER NRF24L01 TRANSIMMTER SIDE
  * JOYSTICKS: 2
  * AXIS: 6
+ * BUZZER: 1
  * DATE:24-12-19
  * VERSION V1.0
  * 
- 
+ */
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <RF24_config.h>
- */
+ 
  #define JS1X A0      //JOYSTICK 1 X-AXIS   DEFINITIONS FOR THE JOYSTICKS
  #define JS1Y A1      //JOYSTICK 1 Y-AXIS
 
@@ -50,7 +47,7 @@ void loop()
   int nBuff = txValue ();
   Serial.println(nBuff);
   radio.stopListening();
-  radio.write(&NbUFF, sizeof(nBuff));
+  radio.write(&nBuff, sizeof(nBuff));
   delay(5);
 
 
