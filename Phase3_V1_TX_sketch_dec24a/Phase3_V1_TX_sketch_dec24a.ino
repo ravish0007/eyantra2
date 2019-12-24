@@ -23,6 +23,8 @@
 
  #define txBuzz 10    //BUZZER CONN
 
+ RF24 radio(7, 8);    // CE, CSN
+ const byte addresses[][6] = {"00001", "00002"};  //[0] for Rx & [1] for Tx
 
  int txValue ();
 
@@ -35,16 +37,21 @@
   pinMode(JS2X,INPUT);
   pinMode(JS2Y,INPUT);
   pinMode(txBuzz,OUTPUT);
-  digitalWrite(txBuzz,HIGH);
+  digitalWrite(txBuzz,HIGH);          //BUZZEER DEFAULT STATE OFF
+
+  radio.begin();
+  radio.openWritingPipe(addresses[1]); // 00002
+  radio.openReadingPipe(1, addresses[0]); // 00001
+  radio.setPALevel(RF24_PA_MIN);
 }
 
-void loop() {
-
-
-
-int nBuff = txValue ();
-
-Serial.println(nBuff);
+void loop()
+{
+  int nBuff = txValue ();
+  Serial.println(nBuff);
+  radio.stopListening();
+  radio.write(&NbUFF, sizeof(nBuff));
+  delay(5);
 
 
 /*
