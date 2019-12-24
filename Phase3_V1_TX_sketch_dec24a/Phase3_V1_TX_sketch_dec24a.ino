@@ -15,7 +15,7 @@
 #include <RF24.h>
 #include <RF24_config.h>
  */
- #define JS1X A0      //JOYSTICK 1 X-AXIS
+ #define JS1X A0      //JOYSTICK 1 X-AXIS   DEFINITIONS FOR THE JOYSTICKS
  #define JS1Y A1      //JOYSTICK 1 Y-AXIS
 
  #define JS2X A4      //JOYSTICK 2 X-AXIS
