@@ -1,20 +1,17 @@
-
-
-
-
 /*
- * PROGRAM FOR SENDING JOYSTICK DATA OVER NRF24L01 
+ * PROGRAM FOR SENDING JOYSTICK DATA OVER NRF24L01 TRANSIMMTER SIDE
  * JOYSTICKS: 2
  * AXIS: 6
+ * BUZZER: 1
  * DATE:24-12-19
  * VERSION V1.0
  * 
- 
+ */
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <RF24_config.h>
- */
+ 
  #define JS1X A0      //JOYSTICK 1 X-AXIS   DEFINITIONS FOR THE JOYSTICKS
  #define JS1Y A1      //JOYSTICK 1 Y-AXIS
 
@@ -23,6 +20,8 @@
 
  #define txBuzz 10    //BUZZER CONN
 
+ RF24 radio(7, 8);    // CE, CSN
+ const byte addresses[][6] = {"00001", "00002"};  //[0] for Rx & [1] for Tx
 
  int txValue ();
 
@@ -35,16 +34,21 @@
   pinMode(JS2X,INPUT);
   pinMode(JS2Y,INPUT);
   pinMode(txBuzz,OUTPUT);
-  digitalWrite(txBuzz,HIGH);
+  digitalWrite(txBuzz,HIGH);          //BUZZEER DEFAULT STATE OFF
+
+  radio.begin();
+  radio.openWritingPipe(addresses[1]); // 00002
+  radio.openReadingPipe(1, addresses[0]); // 00001
+  radio.setPALevel(RF24_PA_MIN);
 }
 
-void loop() {
-
-
-
-int nBuff = txValue ();
-
-Serial.println(nBuff);
+void loop()
+{
+  int nBuff = txValue ();
+  Serial.println(nBuff);
+  radio.stopListening();
+  radio.write(&nBuff, sizeof(nBuff));
+  delay(5);
 
 
 /*
