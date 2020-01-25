@@ -18,6 +18,9 @@ RF24 radio(7, 8); // CSN, CE
 const byte address[6] = "00001";
 
 
+// TODO : sperate channel allocation for transmitter
+
+
 
 int servo_pin_one   = 2;
 int servo_pin_two   = 3;
