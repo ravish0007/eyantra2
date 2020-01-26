@@ -49,12 +49,12 @@ typedef struct states
 
 {
 
-  int FRONT = 0;
-  int RIGHT = 1;
+    static const  int FRONT = 0;
+    static const  int RIGHT = 1;
 
- // int BACK  = 2;
+    //static const int BACK  = 2;
 
-  int LEFT  = 3;
+    static const  int LEFT = 3;
 
 };
 
@@ -118,7 +118,7 @@ void print_state(int state)
 
 
 
-void move_serveo(state)
+void move_serveo(int state)
 
 {
 

@@ -55,12 +55,12 @@ typedef struct states
 
 {
 
-  int FRONT = 0;
-  int RIGHT = 1;
+static const int FRONT = 0;
+static const int RIGHT = 1;
 
  // int BACK  = 2;
 
-  int LEFT  = 3;
+static const int LEFT  = 3;
 
 };
 
