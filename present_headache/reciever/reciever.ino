@@ -13,6 +13,8 @@ Servo servo_two   ;       // dorsal left
 Servo servo_three ;       // dorsal right
 
 
+int delay_forward = 15 ;
+
 
 RF24 radio(7, 8); // CSN, CE
 const byte address[6] = "00001";
@@ -22,9 +24,20 @@ const byte address[6] = "00001";
 
 
 
-int servo_pin_one   = 2;
-int servo_pin_two   = 3;
-int servo_pin_three = 4;
+int servo_pin_one   = 5;
+int servo_pin_two   = 4;
+int servo_pin_three = 3;
+
+int tail_servo;
+int left_servo;
+int right_servo;
+
+
+int positional_array[2] ;
+
+
+
+
 
 
 
@@ -59,7 +72,6 @@ typedef struct states
 };
 
 
-states STATE;
 
 
 void setup() 
@@ -78,13 +90,14 @@ void setup()
   
 
   radio.openReadingPipe(0, address);
-  radio.setPALevel(RF24_PA_MIN);
+  radio.setPALevel(RF24_PA_MAX);
   radio.startListening();
 
 
 }
 
 
+states STATE ;
 
 void print_state(int state)
 
@@ -116,45 +129,83 @@ void print_state(int state)
 
 
 
+void change_velocity()
+{
 
 
-void move_serveo(int state)
+  if ( delay_forward == 1 )
+  {
+
+    return ;
+  }
+  
+  else {
+    
+  
+
+  
+
+
+
+
+
+          for (int pos = 1; pos <= 180; pos += 1) 
+          {
+   
+           servo_one.write(pos);              
+           delay(delay_forward);                      
+          }
+
+        for (int pos = 180; pos >= 1; pos -= 1) 
+          {
+   
+          servo_one.write(pos);              
+           delay(delay_forward);                      
+          }
+  
+    }
+
+
+}
+
+void move_serveo()
 
 {
 
 
-    int angle_bank = 150 ;  // for dorsal fins, better we implement propotional to the voltage 
-
-    switch(state)
-
-    {
+  tail_servo  = positional_array[1] ;
+  left_servo  = positional_array[0] ;
+  right_servo = 180 - left_servo ;
 
 
-     case STATE.FRONT :   servo_one.write(0)   ;
-                          _delay_ms(1000)      ;          // Son adjust delay accordingly       
-                          servo_one.write(180) ;
-                          _delay_ms(1000)      ;       
-                          servo_one.write(90)  ;
-                                         break ;
+  if (tail_servo != 93)
+  {
+     if ( tail_servo > 93 )
+     {
+      
+      delay_forward = 4 ;
+      
+     }
 
-     case STATE.RIGHT :   
-                          servo_two.write(angle_bank)         ;
-                          servo_three.write(180 - angle_bank) ;
-                          _delay_ms(1000)                     ;        // again adjust here
-                                                        break ; 
-                                                              
-     case STATE.LEFT :   
-                          servo_two.write(180 - angle_bank)   ;        // Just anti rotate
-                          servo_three.write(angle_bank)       ;
-                          _delay_ms(1000)                     ;        // again adjust here
-                                                        break ;  
-
-
-     default : Serial.println("Error in transmission, Exception at move_servo  ");
+    else if ( tail_servo < 93 )
+     {
+      
+      delay_forward = 2 ;
+      
+     }   
+  
+  }
 
 
+  else
+  {
+      delay_forward = 1 ;
+    
+  }
 
-    }
+  
+  servo_two.write(left_servo);
+  servo_three.write(right_servo);
 
 
 }
@@ -165,7 +216,19 @@ void move_serveo(int state)
 
 
 
+void recieve_radio()
 
+{
+
+        radio.read(&positional_array, sizeof(positional_array));
+
+
+        Serial.println(positional_array[0]);
+        Serial.println(positional_array[1]);
+        Serial.println("---------------------");
+
+        delay(100);
+}
 
 void loop() 
 
@@ -173,16 +236,18 @@ void loop()
 
 
 
+
+ change_velocity();
+
+ 
   if (radio.available()) 
     
     {
 
+         recieve_radio() ;
 
 
-        int state ;
-        radio.read(&state, sizeof(state));
 
-        print_state(state); 
 
 
 /*        # TODO:
@@ -195,7 +260,7 @@ void loop()
 */
 
 
-        move_serveo(state);
+        move_serveo();
     
 
        }
