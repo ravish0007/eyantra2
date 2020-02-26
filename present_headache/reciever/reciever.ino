@@ -178,16 +178,16 @@ void move_serveo()
   right_servo = 180 - left_servo ;
 
 
-  if (tail_servo != 93)
+  if (  tail_servo != 91)
   {
-     if ( tail_servo > 93 )
+     if ( tail_servo > 91 )
      {
       
       delay_forward = 4 ;
       
      }
 
-    else if ( tail_servo < 93 )
+    else if ( tail_servo < 91 )
      {
       
       delay_forward = 2 ;

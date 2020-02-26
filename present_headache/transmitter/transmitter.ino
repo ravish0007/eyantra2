@@ -11,12 +11,12 @@ int joystick_one_x_key = A1;
 int joystick_one_y_key = A0;                                               
 
 
-/*
 
-int joystick_two_x_key = A3 ;                                               
-int joystick_two_y_key = A4 ;                                             
 
-*/
+int joystick_two_x_key = A2 ;                                               
+int joystick_two_y_key = A3 ;                                             
+
+
 
 
 
@@ -30,6 +30,17 @@ int joystick_two_y_pos;
 
 
 
+int prev_joystick_one_x_pos = 89;
+int prev_joystick_one_y_pos;
+
+
+int prev_joystick_two_x_pos;
+int prev_joystick_two_y_pos = 93;
+
+
+
+
+int positional_array[2] ;
 
 
 
@@ -57,9 +68,6 @@ typedef struct states
 
 static const int FRONT = 0;
 static const int RIGHT = 1;
-
- // int BACK  = 2;
-
 static const int LEFT  = 3;
 
 };
@@ -92,93 +100,78 @@ void setup() {
 
   radio.begin();
   radio.openWritingPipe(address);
-  radio.setPALevel(RF24_PA_MIN);
+  radio.setPALevel(RF24_PA_MAX);
   radio.stopListening();
 
   pinMode (joystick_one_x_key, INPUT) ;                     
   pinMode (joystick_one_y_key, INPUT) ;    
 
 
-//  pinMode (joystick_two_x_key, INPUT) ;                     
-//  pinMode (joystick_two_y_key, INPUT) ;    
+  pinMode (joystick_two_x_key, INPUT) ;                     
+  pinMode (joystick_two_y_key, INPUT) ;    
 
 
 }
 
 
 
-int  read_joystick()
+void  read_joystick()
 {
 
-
-    joystick_one_x_pos = analogRead (joystick_one_x_key) ;
-    joystick_one_y_pos = analogRead (joystick_one_y_key) ;
-
-
-//    joystick_two_x_pos = analogRead (joystick_two_x_key) ;
-//    joystick_two_y_pos = analogRead (joystick_two_y_key) ;
+  prev_joystick_one_x_pos = joystick_one_x_pos ;
+  prev_joystick_two_y_pos = joystick_one_x_pos ;
 
 
-
-
-
-    int state = -1 ;
-
-    if ( ( joystick_one_x_pos > 0 ) && ( joystick_one_y_pos > 500 ) )      // Encode values
-  
-    {
-        state = STATE.FRONT ;
-    }
-   
+  joystick_one_x_pos = analogRead (joystick_one_x_key) ;  
+  joystick_one_y_pos = analogRead (joystick_one_y_key) ; 
 
   
-
-/*
-
-    else if ( ( joystick_two_x_pos > 100 ) && ( joystick_two_y_pos > 500 ) )
-
-    {   
-        state = STATE.LEFT ;
-    }
-  
- 
-    else if ( ( joystick_two_x_pos < 100 ) && ( joystick_two_y_pos < 500 ) )
-
-    {
-        state = STATE.RIGHT ;
-
-    }
+  joystick_two_x_pos = analogRead (joystick_two_x_key) ; 
+  joystick_two_y_pos = analogRead (joystick_two_y_key) ; 
 
 
+  joystick_one_x_pos = map(joystick_one_x_pos, 0 , 1023, 0, 180);
+  joystick_one_y_pos = map(joystick_one_y_pos, 0 , 1023, 0, 180);
+  joystick_two_x_pos = map(joystick_two_x_pos, 0 , 1023, 0, 180);
+  joystick_two_y_pos = map(joystick_two_y_pos, 0 , 1023, 0, 180);
 
-*/
-  
-    else
+  positional_array[0] = joystick_one_x_pos;
+  positional_array[1] = joystick_two_y_pos;
 
-    { 
-        return -1 ;    // Invalid state
-    }
-
-
-
-    return state ;
+  Serial.println(joystick_one_x_pos);
+  Serial.println(joystick_two_y_pos);
+  Serial.println("---------------------");
 
 
 }
 
 
+
+void send_radio()
+
+{
+
+if ( ( prev_joystick_two_y_pos != joystick_two_y_pos ) ||  ( prev_joystick_two_y_pos != prev_joystick_two_y_pos ) )
+{
+
+radio.write(&positional_array, sizeof(positional_array));
+//radio.write(&joystick_one_x_pos, sizeof(joystick_one_x_pos));
+}
+  
+}
 
 
 void loop() 
 
 {
 
-   int state ; 
 
-   state =  read_joystick();
+  read_joystick();
 
-   radio.write(&state, sizeof(state));
-   delay(100);
+  
+   send_radio();
+   
+   delay(10);
 
 /*    TODO
 
